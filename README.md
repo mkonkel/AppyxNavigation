@@ -19,8 +19,8 @@ Composer navigation libraries.
 ### The project:
 
 Base project setup as always is made with [Kotlin Multiplatform Wizard](https://kmp.jetbrains.com), we also need to add
-some [Appyx](https://github.com/bumble-tech/appyx) as it is the core thing that we would like to examine.
-Appyx consist of three main libraries that complement itself ***navigation***, ***interactions*** and ***Components*** this allow us to create an application that is fully customized.
+[Appyx](https://github.com/bumble-tech/appyx) as it is the core thing that we would like to examine.
+Appyx consist of three main libraries that complement itself ***navigation***, ***interactions*** and ***components*** this allow us to create an application that is fully customized.
 
 *libs.versions.toml*
 
