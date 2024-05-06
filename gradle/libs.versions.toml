@@ -14,8 +14,13 @@ compose = "1.6.6"
 compose-plugin = "1.6.2"
 junit = "4.13.2"
 kotlin = "1.9.23"
+appyx="2.0.1"
 
 [libraries]
+appyx-navigation = { module = "com.bumble.appyx:appyx-navigation", version.ref = "appyx" }
+appyx-interactions= { module = "com.bumble.appyx:appyx-interactions", version.ref = "appyx" }
+appyx-components-backstack = { module = "com.bumble.appyx:backstack", version.ref = "appyx" }
+
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

@@ -39,6 +39,10 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+
+            implementation(libs.appyx.navigation)
+            implementation(libs.appyx.interactions)
+            implementation(libs.appyx.components.backstack)
         }
     }
 }

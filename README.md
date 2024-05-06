@@ -20,16 +20,18 @@ Composer navigation libraries.
 
 Base project setup as always is made with [Kotlin Multiplatform Wizard](https://kmp.jetbrains.com), we also need to add
 [Appyx](https://github.com/bumble-tech/appyx) as it is the core thing that we would like to examine.
-Appyx consist of three main libraries that complement itself ***navigation***, ***interactions*** and ***components*** this allow us to create an application that is fully customized.
+Appyx consist of three main libraries that complement itself ***navigation***, ***interactions*** and ***components*** this allows us to create an application that is fully customized.
 
 *libs.versions.toml*
 
 ```toml
 [versions]
+appyx="2.0.1"
 
 [libraries]
-
-[plugins]
+appyx-navigation = { module = "com.bumble.appyx:appyx-navigation", version.ref = "appyx" }
+appyx-interactions = { module = "com.bumble.appyx:appyx-interactions", version.ref = "appyx" }
+appyx-components-backstack = { module = "com.bumble.appyx:backstack", version.ref = "appyx" }
 
 ```
 
@@ -39,7 +41,9 @@ Freshly added dependencies needs to be synced with the project and added to the 
 sourceSets {
     commonMain.dependencies {
         ...
-        implementation(libs)
+        implementation(libs.appyx.navigation)
+        implementation(libs.appyx.interactions)
+        implementation(libs.appyx.components.backstack)
     }
 }
 ```
