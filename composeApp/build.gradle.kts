@@ -43,6 +43,7 @@ kotlin {
             implementation(libs.appyx.navigation)
             implementation(libs.appyx.interactions)
             implementation(libs.appyx.components.backstack)
+            api(libs.appyx.utils.material)
         }
     }
 }

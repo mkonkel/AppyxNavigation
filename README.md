@@ -73,17 +73,59 @@ they are called ***children***. The ***node*** is standalone unit with own:
 The ***nodes*** can be as small as you want to keep the complexity of your logic low and encapsulated end extracted to
 the **children*** to compose the process. With the nodes your navigation can work as a tree with multiple branches
 responsible for different processes. Some parts of the tree are active - visible on the screen, other are stashed. To
-change what's currently active we will use the component, the change will look like navigation. By the adding or removing nodes of node.
-
-There is also [ChildAwareAPI](https://bumble-tech.github.io/appyx/navigation/features/childaware/) that helps with
+change what's currently active we will use the component, the change will look like navigation. By the adding or
+removing nodes of node. Such approach creates
+a [Scoped DI](https://bumble-tech.github.io/appyx/navigation/features/scoped-di/) the situation
+where if the parent node is destroyed all of its children nodes and related objects are released. There is
+also [ChildAwareAPI](https://bumble-tech.github.io/appyx/navigation/features/childaware/) that helps with
 communication between parent and dynamically added child.
 
+After that short introduction it's time to code. First thing that we need to create is ***RootNode***.
 
+```kotlin
+class RootNode(
+    nodeContext: NodeContext,
+) : LeafNode(nodeContext) {
 
+    @Composable
+    override fun Content(modifier: Modifier) {
+        super.Content(modifier)
+    }
+}
+```
 
+Similarly, as in the [Decompose lib](https://github.com/mkonkel/DecomposeNavigation) we need to provide some kind of
+context. The `NodeContext` is created on the host platform (ex. Androids MainActivity) and it is passed down to all the
+descendants.
+It's ensures the support of lifecycle and keeps the structured hierarchy od children nodes. The `LeafNode` uses the
+context and handle all the lifecycle events, manages plugins, provides the coroutines scope and manage the children
+creation to keeps the structured nodes hierarchy mentioned in ***scoped DI***. It also forces us to implement a
+***@Composable*** function `Content` that will be used to create the view.
 
+Let's connect the ***RootNode*** with the hosts. For Android we need to use ***MainActivity*** and inherit from
+the `NodeActivity()` which under thr hood integrates the android with Appyx. Then we need to create the `NodeHost` (that
+is responsible for providing ***nodeContext***) and provide it with ***lifecycle***.
 
+```kotlin
+class MainActivity : NodeActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
+        setContent {
+            MaterialTheme {
+                NodeHost(
+                    lifecycle = AndroidLifecycle(LocalLifecycleOwner.current.lifecycle),
+                    integrationPoint = appyxIntegrationPoint
+                ) { nodeContext ->
+                    RootNode(nodeContext)
+                }
+            }
+        }
+    }
+}
+```
+
+Now the iOS. As it is a compose function we just need to create proper host the `IosNodeHost`
 
 ---
 
