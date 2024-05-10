@@ -110,7 +110,13 @@ class RootNode(
 
     @Composable
     override fun Content(modifier: Modifier) {
-        super.Content(modifier)
+        Column(
+            modifier = Modifier.fillMaxSize().then(modifier),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Hello Appyx!")
+        }
     }
 }
 ```
@@ -154,7 +160,97 @@ class MainActivity : NodeComponentActivity() {
 }
 ```
 
-Now the iOS. As it is a compose function we just need to create proper host the `IosNodeHost`
+Now the iOS. As it is a compose function we just need to create proper host the `IosNodeHost` with
+default `IntegrationPoint`.
+
+```kotlin
+fun MainViewController() = ComposeUIViewController {
+    IosNodeHost(
+        modifier = Modifier,
+        integrationPoint = MainIntegrationPoint(),
+        onBackPressedEvents = backEvents.receiveAsFlow()
+    ) { nodeContext ->
+        RootNode(nodeContext)
+    }
+}
+```
+
+The basic setup was done, we were able to display initial screen with the text. Now we can add children screens. The
+screen definition need to be defined as `Parcelable` it will tell the node where we ant to go. The `Parcelable` is a
+part of Appyx library and it's expect/actual class so it has a common definition that is implemented differently on
+platforms.
+
+```kotlin
+sealed class NavTarget : Parcelable {
+    @Parcelize
+    data object FirstScreen : NavTarget()
+
+    @Parcelize
+    data object SecondScreen : NavTarget()
+}
+```
+
+Targets are defined, the ***RootNode*** needs to be modified. It should handle the `BackStack` component, and know how
+to navigate from one screen to another.
+The first change that we need to do is to change the ***RootNode*** from being just a `LeafNode` to be a `Node<>`. First
+one was a simple node that can't have children and was used to display the content. The second one is a node that can
+have children and can be used to navigate between them.
+
+The ***Node*** requires the `NavTarget` to be defined
+and `buildChildNode` function to be implemented - those two things will be responsible for handling creation of the
+children nodes.
+
+Second important thing is the `appyxComponent = ` parameter that is used to define the way how the nodes will be
+handled.
+
+```kotlin
+private fun backstack(nodeContext: NodeContext): BackStack<NavTarget> = BackStack(
+    model = BackStackModel(
+        initialTarget = NavTarget.FirstScreen,
+        savedStateMap = nodeContext.savedStateMap,
+    ),
+    visualisation = { BackStackFader(it) }
+)
+```
+
+```kotlin
+class RootNode(
+    nodeContext: NodeContext,
+    private val backstack: BackStack<NavTarget> = backstack(nodeContext),
+) : Node<NavTarget>(
+    appyxComponent = backstack,
+    nodeContext = nodeContext,
+) {
+    override fun buildChildNode(navTarget: NavTarget, nodeContext: NodeContext): Node<*> = when (navTarget) {
+        NavTarget.FirstScreen -> node(nodeContext) { Text("Firs Screen") }
+        NavTarget.SecondScreen -> node(nodeContext) { Text("Firs Screen") }
+    }
+}
+```
+
+Please note that we used a helper function `node{}` to create simple nodes that will display the text. In the next steps
+we will create proper child nodes and their UI. The last thing to do is to handle some interactions on the***RootNode***
+that will invoke our navigation.
+
+We need to
+add [AppyxNavigationContainer](https://bumble-tech.github.io/appyx/interactions/usage/?h=appyxnavigationcontainer#in-the-scope-of-appyx-navigation)
+that will handle and the navigation and render the added nodes.
+
+```kotlin
+    @Composable
+override fun Content(modifier: Modifier) {
+    Column {
+        AppyxNavigationContainer(
+            modifier = Modifier.weight(1f),
+            appyxComponent = backstack
+        )
+        Column {
+            Button(onClick = { backstack.push(NavTarget.FirstScreen) }) { Text("First Screen") }
+            Button(onClick = { backstack.push(NavTarget.SecondScreen) }) { Text("Second Screen") }
+        }
+    }
+}
+```
 
 ---
 
