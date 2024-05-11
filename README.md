@@ -277,11 +277,9 @@ class RootNode(
 }
 ```
 
-
-
 We need to
 add [AppyxNavigationContainer](https://bumble-tech.github.io/appyx/interactions/usage/?h=appyxnavigationcontainer#in-the-scope-of-appyx-navigation)
-that will handle and the navigation and render the added nodes.
+that will handle and the navigation and render the added nodes content.
 
 ```kotlin
 @Composable
@@ -289,6 +287,8 @@ override fun Content(modifier: Modifier) {
   AppyxNavigationContainer(appyxComponent = backstack)
 }
 ```
+
+![AppyxNavigation](/blog/images/1_navigation.gif "Basic Navogation with Appyx")
 
 ---
 
