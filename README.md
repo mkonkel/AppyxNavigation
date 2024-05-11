@@ -220,6 +220,43 @@ private fun backstack(nodeContext: NodeContext): BackStack<NavTarget> = BackStac
 )
 ```
 
+Now we need to add some destination nodes, they would be same with different texts only.
+
+```kotlin
+class FirstNode(
+    nodeContext: NodeContext
+) : LeafNode(nodeContext = nodeContext) {
+    @Composable
+    override fun Content(modifier: Modifier) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Hello from the First Node!")
+        }
+    }
+}
+```
+
+To be able to navigate between the screens we will ad simple lambdas, that will be called in child nodes, but handled in root node.
+
+```kotlin
+class FirstNode(
+    private val onButtonClick: () -> Unit
+) : LeafNode(nodeContext = nodeContext) {
+    @Composable
+    override fun Content(modifier: Modifier) {
+       ...    
+       TextButton(onClick = onButtonClick) {
+           Text("Go to Second Node")
+       }
+    }
+}
+```
+
+Going back to the ***RoodNode***
+
 ```kotlin
 class RootNode(
     nodeContext: NodeContext,
@@ -228,34 +265,28 @@ class RootNode(
     appyxComponent = backstack,
     nodeContext = nodeContext,
 ) {
-    override fun buildChildNode(navTarget: NavTarget, nodeContext: NodeContext): Node<*> = when (navTarget) {
-        NavTarget.FirstScreen -> node(nodeContext) { Text("Firs Screen") }
-        NavTarget.SecondScreen -> node(nodeContext) { Text("Firs Screen") }
+  override fun buildChildNode(navTarget: NavTarget, nodeContext: NodeContext): Node<*> =
+    when (navTarget) {
+      NavTarget.FirstScreen -> FirstNode(nodeContext) {
+        backstack.push(NavTarget.SecondScreen)
+      }
+      NavTarget.SecondScreen -> SecondNode(nodeContext) {
+        backstack.push(NavTarget.FirstScreen)
+      }
     }
 }
 ```
 
-Please note that we used a helper function `node{}` to create simple nodes that will display the text. In the next steps
-we will create proper child nodes and their UI. The last thing to do is to handle some interactions on the***RootNode***
-that will invoke our navigation.
+
 
 We need to
 add [AppyxNavigationContainer](https://bumble-tech.github.io/appyx/interactions/usage/?h=appyxnavigationcontainer#in-the-scope-of-appyx-navigation)
 that will handle and the navigation and render the added nodes.
 
 ```kotlin
-    @Composable
+@Composable
 override fun Content(modifier: Modifier) {
-    Column {
-        AppyxNavigationContainer(
-            modifier = Modifier.weight(1f),
-            appyxComponent = backstack
-        )
-        Column {
-            Button(onClick = { backstack.push(NavTarget.FirstScreen) }) { Text("First Screen") }
-            Button(onClick = { backstack.push(NavTarget.SecondScreen) }) { Text("Second Screen") }
-        }
-    }
+  AppyxNavigationContainer(appyxComponent = backstack)
 }
 ```
 

@@ -1,8 +1,5 @@
 package navigation
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,23 +19,20 @@ class RootNode(
     appyxComponent = backstack,
     nodeContext = nodeContext,
 ) {
-    override fun buildChildNode(navTarget: NavTarget, nodeContext: NodeContext): Node<*> = when (navTarget) {
-        NavTarget.FirstScreen -> node(nodeContext) { Text("First Screen") }
-        NavTarget.SecondScreen -> node(nodeContext) { Text("Second Screen") }
-    }
+    override fun buildChildNode(navTarget: NavTarget, nodeContext: NodeContext): Node<*> =
+        when (navTarget) {
+            NavTarget.FirstScreen -> FirstNode(nodeContext) {
+                backstack.push(NavTarget.SecondScreen)
+            }
+
+            NavTarget.SecondScreen -> SecondNode(nodeContext) {
+                backstack.push(NavTarget.FirstScreen)
+            }
+        }
 
     @Composable
     override fun Content(modifier: Modifier) {
-        Column {
-            AppyxNavigationContainer(
-                modifier = Modifier.weight(1f),
-                appyxComponent = backstack
-            )
-            Row {
-                Button(onClick = { backstack.push(NavTarget.FirstScreen) }) { Text("First Screen") }
-                Button(onClick = { backstack.push(NavTarget.SecondScreen) }) { Text("Second Screen") }
-            }
-        }
+        AppyxNavigationContainer(appyxComponent = backstack)
     }
 }
 
