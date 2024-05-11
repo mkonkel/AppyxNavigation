@@ -178,7 +178,14 @@ fun MainViewController() = ComposeUIViewController {
 The basic setup was done, we were able to display initial screen with the text. Now we can add children screens. The
 screen definition need to be defined as `Parcelable` it will tell the node where we ant to go. The `Parcelable` is a
 part of Appyx library and it's expect/actual class so it has a common definition that is implemented differently on
-platforms.
+platforms. For android platform we need to add the support od [kotlin-parcelize](https://developer.android.com/kotlin/parcelize) plugin to use `@Parcelize` annotation.
+
+```kotlin
+plugins {
+    ...
+    id("kotlin-parcelize")
+}
+```
 
 ```kotlin
 sealed class NavTarget : Parcelable {
