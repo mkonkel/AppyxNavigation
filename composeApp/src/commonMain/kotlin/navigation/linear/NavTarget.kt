@@ -1,4 +1,4 @@
-package navigation
+package navigation.linear
 
 import com.bumble.appyx.utils.multiplatform.Parcelable
 import com.bumble.appyx.utils.multiplatform.Parcelize
@@ -9,4 +9,7 @@ sealed class NavTarget : Parcelable {
 
     @Parcelize
     data object SecondScreen : NavTarget()
+
+    @Parcelize
+    data object TabScreen : NavTarget()
 }

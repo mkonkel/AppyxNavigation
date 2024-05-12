@@ -20,6 +20,7 @@ appyx="2.0.1"
 appyx-navigation = { module = "com.bumble.appyx:appyx-navigation", version.ref = "appyx" }
 appyx-interactions= { module = "com.bumble.appyx:appyx-interactions", version.ref = "appyx" }
 appyx-components-backstack = { module = "com.bumble.appyx:backstack", version.ref = "appyx" }
+appyx-components-spotlingh = { module = "com.bumble.appyx:spotlight", version.ref = "appyx" }
 appyx-utils-material = { module = "com.bumble.appyx:utils-material3", version.ref = "appyx" }
 
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

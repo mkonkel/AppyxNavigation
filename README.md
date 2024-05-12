@@ -48,7 +48,7 @@ sourceSets {
         ...
         implementation(libs.appyx.navigation)
         implementation(libs.appyx.interactions)
-        implementation(libs.appyx.components.backstack)
+        api(libs.appyx.components.backstack)
     }
 }
 ```
@@ -178,7 +178,8 @@ fun MainViewController() = ComposeUIViewController {
 The basic setup was done, we were able to display initial screen with the text. Now we can add children screens. The
 screen definition need to be defined as `Parcelable` it will tell the node where we ant to go. The `Parcelable` is a
 part of Appyx library and it's expect/actual class so it has a common definition that is implemented differently on
-platforms. For android platform we need to add the support od [kotlin-parcelize](https://developer.android.com/kotlin/parcelize) plugin to use `@Parcelize` annotation.
+platforms. For android platform we need to add the support
+od [kotlin-parcelize](https://developer.android.com/kotlin/parcelize) plugin to use `@Parcelize` annotation.
 
 ```kotlin
 plugins {
@@ -239,7 +240,8 @@ class FirstNode(
 }
 ```
 
-To be able to navigate between the screens we will ad simple lambdas, that will be called in child nodes, but handled in root node.
+To be able to navigate between the screens we will ad simple lambdas, that will be called in child nodes, but handled in
+root node.
 
 ```kotlin
 class FirstNode(
@@ -247,10 +249,10 @@ class FirstNode(
 ) : LeafNode(nodeContext = nodeContext) {
     @Composable
     override fun Content(modifier: Modifier) {
-       ...    
-       TextButton(onClick = onButtonClick) {
-           Text("Go to Second Node")
-       }
+        ...
+        TextButton(onClick = onButtonClick) {
+            Text("Go to Second Node")
+        }
     }
 }
 ```
@@ -265,15 +267,15 @@ class RootNode(
     appyxComponent = backstack,
     nodeContext = nodeContext,
 ) {
-  override fun buildChildNode(navTarget: NavTarget, nodeContext: NodeContext): Node<*> =
-    when (navTarget) {
-      NavTarget.FirstScreen -> FirstNode(nodeContext) {
-        backstack.push(NavTarget.SecondScreen)
-      }
-      NavTarget.SecondScreen -> SecondNode(nodeContext) {
-        backstack.push(NavTarget.FirstScreen)
-      }
-    }
+    override fun buildChildNode(navTarget: NavTarget, nodeContext: NodeContext): Node<*> =
+        when (navTarget) {
+            NavTarget.FirstScreen -> FirstNode(nodeContext) {
+                backstack.push(NavTarget.SecondScreen)
+            }
+            NavTarget.SecondScreen -> SecondNode(nodeContext) {
+                backstack.push(NavTarget.FirstScreen)
+            }
+        }
 }
 ```
 
@@ -284,11 +286,107 @@ that will handle and the navigation and render the added nodes content.
 ```kotlin
 @Composable
 override fun Content(modifier: Modifier) {
-  AppyxNavigationContainer(appyxComponent = backstack)
+    AppyxNavigationContainer(appyxComponent = backstack)
 }
 ```
 
 ![AppyxNavigation](/blog/images/1_navigation.gif "Basic Navogation with Appyx")
+
+You can experiment with different visualisations, for example `BackStackFader`, `BackStackSlider`, `BackStackParallax`or
+other mentioned in the [documentation](https://bumble-tech.github.io/appyx/components/backstack/)
+
+### Tab Navigation
+
+Appyx provides a [Material3](https://m3.material.io/) support, so we can easily create a tab navigation using built in components. 
+The material support library uses the (spotlight)[https://bumble-tech.github.io/appyx/components/spotlight/] component under the hood, so the dependencies we need are:
+
+```toml
+appyx-components-spotlingh = { module = "com.bumble.appyx:spotlight", version.ref = "appyx" }
+appyx-utils-material = { module = "com.bumble.appyx:utils-material3", version.ref = "appyx" }
+```
+
+```kotlin
+        commonMain.dependencies {
+    ...
+    api(libs.appyx.components.spotlingh)
+    api(libs.appyx.utils.material)
+}
+```
+
+After syncing the project we will reach the `AppyxNavItem` which will be used in a bottom navigation and
+the `AppyxMaterial3NavNode` responsible for navigation.
+Creation of the ***TabNavigationItems*** is pretty straightforward and similar to the previously used linear navigation.
+We need to create **destinations** in our case these will be the enums that will represent the screens/nodes.
+
+```kotlin
+@Parcelize
+enum class TabNavigationItems : Parcelable {
+    FIRST_DESTINATION, SECOND_DESTINATION;
+}
+```
+
+Now we can create the ***resolver*** that will be responsible for creating the bottom bar. It takes the defined
+***destination*** and creates the proper navigation items, with ***text***, ***icons*** and lambda that will create
+desired ***nodes***.
+
+```kotlin
+companion object {
+  val resolver: (TabNavigationItems) -> AppyxNavItem = { navBarItem ->
+    when (navBarItem) {
+      FIRST_DESTINATION -> AppyxNavItem(
+        text = "Third",
+        unselectedIcon = Icons.Sharp.Home,
+        selectedIcon = Icons.Filled.Home,
+        node = { ThirdNode(it) }
+      )
+
+      SECOND_DESTINATION -> AppyxNavItem(
+        text = "Fourth",
+        unselectedIcon = Icons.Sharp.AccountBox,
+        selectedIcon = Icons.Filled.AccountBox,
+        node = { FourthNode(it) }
+      )
+    }
+  }
+}
+```
+The nodes will be exactly the same but with a different text and a background.
+
+```kotlin
+class ThirdNode(
+    nodeContext: NodeContext,
+) : LeafNode(nodeContext = nodeContext) {
+    @Composable
+    override fun Content(modifier: Modifier) {
+        Column(
+            modifier = Modifier.fillMaxSize().background(Color.Magenta),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Hello from the Third Node!")
+        }
+    }
+}
+```
+
+The last thing to do is to create proper node.
+
+```kotlin
+class TabNode(
+    nodeContext: NodeContext,
+) : AppyxMaterial3NavNode<TabNavigationItems>(
+    nodeContext = nodeContext,
+    navTargets = TabNavigationItems.entries,
+    navTargetResolver = TabNavigationItems.resolver,
+    initialActiveElement = TabNavigationItems.FIRST_DESTINATION,
+)
+```
+
+The solution is ready to use, as it was designed to work jus out of the box we need to add only the entrypoint to our existing navigation.
+We need to add `TabScreen` as a ***NavTarget*** in the linear navigation, and a button in `FirstNode` that will run the ***tabbed navigation*** feature.
+
+![Tabbed Navigation](/blog/images/2_tabbed_navigation.gif "Tabbed Navigation with Appyx")
+
 
 ---
 

@@ -1,6 +1,5 @@
 package navigation
 
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.bumble.appyx.components.backstack.BackStack
@@ -10,7 +9,10 @@ import com.bumble.appyx.components.backstack.ui.fader.BackStackFader
 import com.bumble.appyx.navigation.composable.AppyxNavigationContainer
 import com.bumble.appyx.navigation.modality.NodeContext
 import com.bumble.appyx.navigation.node.Node
-import com.bumble.appyx.navigation.node.node
+import navigation.linear.NavTarget
+import navigation.linear.nodes.FirstNode
+import navigation.linear.nodes.SecondNode
+import navigation.tabbed.TabNode
 
 class RootNode(
     nodeContext: NodeContext,
@@ -21,13 +23,17 @@ class RootNode(
 ) {
     override fun buildChildNode(navTarget: NavTarget, nodeContext: NodeContext): Node<*> =
         when (navTarget) {
-            NavTarget.FirstScreen -> FirstNode(nodeContext) {
-                backstack.push(NavTarget.SecondScreen)
-            }
+            NavTarget.FirstScreen -> FirstNode(
+                nodeContext = nodeContext,
+                onButtonClick = { backstack.push(NavTarget.SecondScreen) },
+                onTabbedNavClick = { backstack.push(NavTarget.TabScreen) }
+            )
 
             NavTarget.SecondScreen -> SecondNode(nodeContext) {
                 backstack.push(NavTarget.FirstScreen)
             }
+
+            NavTarget.TabScreen -> TabNode(nodeContext)
         }
 
     @Composable
