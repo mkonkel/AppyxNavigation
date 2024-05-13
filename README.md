@@ -394,8 +394,10 @@ class ThirdNode(
 }
 ```
 
-The solution is ready to use, as it was designed to work jus out of the box we need to add only the entrypoint to our existing navigation.
-We need to add `TabScreen` as a ***NavTarget*** in the linear navigation, and a button in `FirstNode` that will run the ***tabbed navigation*** feature.
+The solution is ready to use, as it was designed to work jus out of the box we need to add only the entrypoint to our
+existing navigation.
+We need to add `TabScreen` as a ***NavTarget*** in the linear navigation, and a button in `FirstNode` that will run the
+***tabbed navigation*** feature.
 
 ![Tab Navigation with Spotlight](/blog/images/2_spotlight_tab_navigation.gif "Tab Navigation with Spotlight")
 
@@ -470,8 +472,50 @@ At the end we need to add another entrypoint in the ***FirstNode*** to be able t
 
 ![Tab Navigation with Material](/blog/images/3_material_tab_navigation.gif "Tab Navigation with Material")
 
----
+### Coroutines
+
+There is no official approach how to handle coroutines inside the ***Nodes***, but we can use for example the
+***NodeLifecycle*** which provides the `lifecycle` and `lifecycleScope` and use it (as in the example).
+We can also use the `lifecycle` and add an `observer`with `PlatformLifecycleEventObserver` and create and manage the
+coroutineScope. We can also use the scope ot the @Composable view `rememberCoroutineScope()` or we can mix approaches to
+fit all your needs.
+
+Moving further I will extend the ***SecondNode*** with a countdown timer that will be started on the screen creation and
+update the text value.
+
+```kotlin
+    private val countDownText = mutableStateOf<String>("0")
+
+init {
+    lifecycle.coroutineScope.launch {
+        for (i in 10 downTo 0) {
+            countDownText.value = i.toString()
+            delay(1000)
+        }
+    }
+}
+```
+
+```kotlin
+    @Composable
+override fun Content(modifier: Modifier) {
+    Column(...) {
+        ...
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("Countdown: ${countDownText.value}")
+    }
+}
+```
+
+You should think about a better place to hold your business logic than `Node` a place that can handle the configuration
+changes and recreating of the view, a place that can retain the state. The `ViewModel` is a perfect place for that, but
+it's not a part of the Appyx library, so you need to implement it by yourself.
+Appyx is currently in the development phase of ***viewmodel*** support and you can vote for
+ith [here](https://bumble-tech.github.io/appyx/navigation/integrations/viewmodel/?h=retain#alternative-retainedinstancestore).
+If you would like to survive configuration changes there is an
+official [guide](https://bumble-tech.github.io/appyx/navigation/features/surviving-configuration-changes/) for that.
+
+![Coroutines](/blog/images/4_coroutines_support.gif "Coroutines")
 
 ### Summary
 
-Cool that it supports WEB also!
