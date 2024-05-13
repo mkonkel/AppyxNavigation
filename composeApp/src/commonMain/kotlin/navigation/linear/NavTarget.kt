@@ -11,5 +11,8 @@ sealed class NavTarget : Parcelable {
     data object SecondScreen : NavTarget()
 
     @Parcelize
-    data object TabScreen : NavTarget()
+    data object SpotlightTabScreen : NavTarget()
+
+    @Parcelize
+    data object MaterialTabScreen : NavTarget()
 }

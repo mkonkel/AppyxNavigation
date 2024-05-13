@@ -17,7 +17,8 @@ import com.bumble.appyx.navigation.node.LeafNode
 class FirstNode(
     nodeContext: NodeContext,
     private val onButtonClick: () -> Unit,
-    private val onTabbedNavClick: () -> Unit,
+    private val onSpotlightTabsClick: () -> Unit,
+    private val onMaterialTabsClick: () -> Unit,
 ) : LeafNode(nodeContext = nodeContext) {
     @Composable
     override fun Content(modifier: Modifier) {
@@ -32,8 +33,12 @@ class FirstNode(
                 Text("Go to Second Node")
             }
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = onTabbedNavClick) {
-                Text("Go to Tabbed Node")
+            Button(onClick = onSpotlightTabsClick) {
+                Text("Go to Spotlight Tabbed Node")
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = onMaterialTabsClick) {
+                Text("Go to Material Tabbed Node")
             }
         }
     }

@@ -12,7 +12,8 @@ import com.bumble.appyx.navigation.node.Node
 import navigation.linear.NavTarget
 import navigation.linear.nodes.FirstNode
 import navigation.linear.nodes.SecondNode
-import navigation.tabbed.TabNode
+import navigation.tabbed.material.MaterialTabNode
+import navigation.tabbed.spotlight.SpotlightNode
 
 class RootNode(
     nodeContext: NodeContext,
@@ -26,14 +27,16 @@ class RootNode(
             NavTarget.FirstScreen -> FirstNode(
                 nodeContext = nodeContext,
                 onButtonClick = { backstack.push(NavTarget.SecondScreen) },
-                onTabbedNavClick = { backstack.push(NavTarget.TabScreen) }
+                onSpotlightTabsClick = { backstack.push(NavTarget.SpotlightTabScreen) },
+                onMaterialTabsClick = { backstack.push(NavTarget.MaterialTabScreen) }
             )
 
             NavTarget.SecondScreen -> SecondNode(nodeContext) {
                 backstack.push(NavTarget.FirstScreen)
             }
 
-            NavTarget.TabScreen -> TabNode(nodeContext)
+            NavTarget.SpotlightTabScreen -> SpotlightNode(nodeContext)
+            NavTarget.MaterialTabScreen -> MaterialTabNode(nodeContext)
         }
 
     @Composable

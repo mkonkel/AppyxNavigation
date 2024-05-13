@@ -290,6 +290,13 @@ override fun Content(modifier: Modifier) {
 }
 ```
 
+```kotlin
+        commonMain.dependencies {
+    ...
+    api(libs.appyx.components.spotlingh)
+}
+```
+
 ![AppyxNavigation](/blog/images/1_navigation.gif "Basic Navogation with Appyx")
 
 You can experiment with different visualisations, for example `BackStackFader`, `BackStackSlider`, `BackStackParallax`or
@@ -297,18 +304,113 @@ other mentioned in the [documentation](https://bumble-tech.github.io/appyx/compo
 
 ### Tab Navigation
 
-Appyx provides a [Material3](https://m3.material.io/) support, so we can easily create a tab navigation using built in components. 
-The material support library uses the (spotlight)[https://bumble-tech.github.io/appyx/components/spotlight/] component under the hood, so the dependencies we need are:
+To handle bottom navigation feature we need to use
+a [Spotlight](https://bumble-tech.github.io/appyx/components/spotlight/) component, which behaves similar to the view
+pager.
+It can hold multiple nodes at the same, and keeps one of them active (visible). The rule is same as with linear
+navigation, we just need to switch form ***backstack*** to ***spotlight***.
 
 ```toml
 appyx-components-spotlingh = { module = "com.bumble.appyx:spotlight", version.ref = "appyx" }
+```
+
+Lets create new navigation targets for tabbed navigation.
+
+```kotlin
+sealed class SpotlightNavTarget : Parcelable {
+    @Parcelize
+    data object ThirdScreen : SpotlightNavTarget()
+
+    @Parcelize
+    data object FourthScreen : SpotlightNavTarget()
+}
+```
+
+Now we need to create a parent node that will hold the spotlight component.
+
+```kotlin
+class SpotlightNode(
+    nodeContext: NodeContext,
+    private val model: SpotlightModel<SpotlightNavTarget> = spotlightModel(nodeContext),
+    private val spotlight: Spotlight<SpotlightNavTarget> = Spotlight(
+        model = model,
+        visualisation = { SpotlightSlider(it, model.currentState) }
+    ),
+) : Node<SpotlightNavTarget>(
+    appyxComponent = spotlight,
+    nodeContext = nodeContext,
+)
+```
+
+We have to provide `SpotlightModel` and `SpotlightVisualisation` one will handle navigation, other the animation.
+The model takes list of elements available to be displayed in the carousel, and initial index of default the active tab.
+
+```kotlin
+private fun spotlightModel(nodeContext: NodeContext) = SpotlightModel(
+    items = listOf(SpotlightNavTarget.ThirdScreen, SpotlightNavTarget.FourthScreen),
+    initialActiveIndex = 0f,
+    savedStateMap = nodeContext.savedStateMap
+)
+```
+
+Last thing to do is to create a UI representation of the screen, we will use `Scaffold` and default buttons
+
+```kotlin
+@Composable
+override fun Content(modifier: Modifier) {
+    Scaffold(
+        bottomBar = {
+            Row(Modifier.background(Color.White)) {
+                TextButton(modifier = Modifier.weight(1f), onClick = { spotlight.first() }) {
+                    Text(text = "Third")
+                }
+                TextButton(modifier = Modifier.weight(1f), onClick = { spotlight.last() }) {
+                    Text(text = "Fourth")
+                }
+            }
+        }
+    ) { paddings ->
+        AppyxNavigationContainer(modifier = Modifier.padding(paddings), appyxComponent = spotlight)
+    }
+}
+```
+
+The nodes will be exactly the same but with a different text and a background.
+
+```kotlin
+class ThirdNode(
+    nodeContext: NodeContext,
+) : LeafNode(nodeContext = nodeContext) {
+    @Composable
+    override fun Content(modifier: Modifier) {
+        Column(
+            modifier = Modifier.fillMaxSize().background(Color.Magenta),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Hello from the Third Node!")
+        }
+    }
+}
+```
+
+The solution is ready to use, as it was designed to work jus out of the box we need to add only the entrypoint to our existing navigation.
+We need to add `TabScreen` as a ***NavTarget*** in the linear navigation, and a button in `FirstNode` that will run the ***tabbed navigation*** feature.
+
+![Tab Navigation with Spotlight](/blog/images/2_spotlight_tab_navigation.gif "Tab Navigation with Spotlight")
+
+Appyx also provides a [Material3](https://m3.material.io/) support with out of the box solution for bottom navigation,
+so we can easily create it using built in components.
+The material support library uses the (spotlight)[https://bumble-tech.github.io/appyx/components/spotlight/] component
+under the hood, so the dependencies we need are:
+
+```toml
 appyx-utils-material = { module = "com.bumble.appyx:utils-material3", version.ref = "appyx" }
 ```
 
 ```kotlin
         commonMain.dependencies {
     ...
-    api(libs.appyx.components.spotlingh)
     api(libs.appyx.utils.material)
 }
 ```
@@ -331,39 +433,21 @@ desired ***nodes***.
 
 ```kotlin
 companion object {
-  val resolver: (TabNavigationItems) -> AppyxNavItem = { navBarItem ->
-    when (navBarItem) {
-      FIRST_DESTINATION -> AppyxNavItem(
-        text = "Third",
-        unselectedIcon = Icons.Sharp.Home,
-        selectedIcon = Icons.Filled.Home,
-        node = { ThirdNode(it) }
-      )
+    val resolver: (TabNavigationItems) -> AppyxNavItem = { navBarItem ->
+        when (navBarItem) {
+            FIRST_DESTINATION -> AppyxNavItem(
+                text = "Third",
+                unselectedIcon = Icons.Sharp.Home,
+                selectedIcon = Icons.Filled.Home,
+                node = { ThirdNode(it) }
+            )
 
-      SECOND_DESTINATION -> AppyxNavItem(
-        text = "Fourth",
-        unselectedIcon = Icons.Sharp.AccountBox,
-        selectedIcon = Icons.Filled.AccountBox,
-        node = { FourthNode(it) }
-      )
-    }
-  }
-}
-```
-The nodes will be exactly the same but with a different text and a background.
-
-```kotlin
-class ThirdNode(
-    nodeContext: NodeContext,
-) : LeafNode(nodeContext = nodeContext) {
-    @Composable
-    override fun Content(modifier: Modifier) {
-        Column(
-            modifier = Modifier.fillMaxSize().background(Color.Magenta),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text("Hello from the Third Node!")
+            SECOND_DESTINATION -> AppyxNavItem(
+                text = "Fourth",
+                unselectedIcon = Icons.Sharp.AccountBox,
+                selectedIcon = Icons.Filled.AccountBox,
+                node = { FourthNode(it) }
+            )
         }
     }
 }
@@ -382,11 +466,9 @@ class TabNode(
 )
 ```
 
-The solution is ready to use, as it was designed to work jus out of the box we need to add only the entrypoint to our existing navigation.
-We need to add `TabScreen` as a ***NavTarget*** in the linear navigation, and a button in `FirstNode` that will run the ***tabbed navigation*** feature.
+At the end we need to add another entrypoint in the ***FirstNode*** to be able to react freshly created screen.
 
-![Tabbed Navigation](/blog/images/2_tabbed_navigation.gif "Tabbed Navigation with Appyx")
-
+![Tab Navigation with Material](/blog/images/3_material_tab_navigation.gif "Tab Navigation with Material")
 
 ---
 

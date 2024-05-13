@@ -1,4 +1,4 @@
-package navigation.tabbed
+package navigation.tabbed.material
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
