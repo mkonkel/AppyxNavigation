@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 
 class SecondNode(
     nodeContext: NodeContext,
-    private val onButtonClick: () -> Unit
+    private val onButtonClick: () -> Unit,
 ) : LeafNode(nodeContext = nodeContext) {
     private val countDownText = mutableStateOf<String>("0")
 

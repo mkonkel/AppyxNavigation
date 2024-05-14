@@ -539,5 +539,3 @@ should try them all and decide which one fits your needs the best.
 I hope this post has given you a good overview of the `Appyx` library and how you can use it to create a navigation in
 your Compose Multiplatform application. If you have any questions or comments, please feel free to leave them below. I'd
 love to hear from you!
-
-```
