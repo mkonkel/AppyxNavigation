@@ -510,7 +510,7 @@ override fun Content(modifier: Modifier) {
 You should think about a better place to hold your business logic than `Node` a place that can handle the configuration
 changes and recreating of the view, a place that can retain the state. The `ViewModel` is a perfect place for that, but
 it's not a part of the Appyx library, so you need to implement it by yourself.
-Appyx is currently in the development phase of ***viewmodel*** support and you can vote for
+Appyx is currently in the development phase of ***viewmodel*** support, and you can vote for
 ith [here](https://bumble-tech.github.io/appyx/navigation/integrations/viewmodel/?h=retain#alternative-retainedinstancestore).
 If you would like to survive configuration changes there is an
 official [guide](https://bumble-tech.github.io/appyx/navigation/features/surviving-configuration-changes/) for that.
@@ -519,3 +519,25 @@ official [guide](https://bumble-tech.github.io/appyx/navigation/features/survivi
 
 ### Summary
 
+The `Appyx` library is a powerful tool that allows you to create a fully customized navigation in your Compose
+Multiplatform application.
+It's a great solution for creating complex navigation structures, and it's easy to use. The library is tightly coupled
+with te Jetpack Compose but doesn't provide dedicated component to hold your business logic, you are free to use your
+own solutions.
+The library is still in the development phase waiting for example for the `ViewModel` support as mentioned in the post.
+Therefore, it doesn't provide an out-of-the-box support for coroutines. You need to handle it by yourself, but it's not
+a big deal.
+
+Comparing to [Decompose](https://github.com/mkonkel/DecomposeNavigation) it was quicker to set up the basic navigation,
+but it needs to use third-party for holding logic and develop whole app.
+From the other side comparing to [Voyager](https://github.com/mkonkel/VoyagerNavigation) I can find a lot of
+similarities on how it was designed to use, and how handles the navigation. Nevertheless, the ***Voyager*** was a bit
+more intuitive for me, and I liked the way how it was designed to use.
+All in all every library has its pros and cons, and it's up to you to choose the best one for your project. I think you
+should try them all and decide which one fits your needs the best.
+
+I hope this post has given you a good overview of the `Appyx` library and how you can use it to create a navigation in
+your Compose Multiplatform application. If you have any questions or comments, please feel free to leave them below. I'd
+love to hear from you!
+
+```
