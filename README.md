@@ -175,11 +175,15 @@ fun MainViewController() = ComposeUIViewController {
 }
 ```
 
-The basic setup was done, we were able to display initial screen with the text. Now we can add children screens. The
-screen definition need to be defined as `Parcelable` it will tell the node where we ant to go. The `Parcelable` is a
-part of Appyx library and it's expect/actual class so it has a common definition that is implemented differently on
+The basic setup was done, we were able to display initial screen with the text. Now we can add
+children screens. The
+screen definition need to be defined as `Parcelable` it will tell the node where we ant to go.
+The `Parcelable` is a
+part of Appyx library and it's expect/actual class so it has a common definition that is implemented
+differently on
 platforms. For android platform we need to add the support
-od [kotlin-parcelize](https://developer.android.com/kotlin/parcelize) plugin to use `@Parcelize` annotation.
+od [kotlin-parcelize](https://developer.android.com/kotlin/parcelize) plugin to use `@Parcelize`
+annotation.
 
 ```kotlin
 plugins {
@@ -198,17 +202,22 @@ sealed class NavTarget : Parcelable {
 }
 ```
 
-Targets are defined, the ***RootNode*** needs to be modified. It should handle the `BackStack` component, and know how
+Targets are defined, the ***RootNode*** needs to be modified. It should handle the `BackStack`
+component, and know how
 to navigate from one screen to another.
-The first change that we need to do is to change the ***RootNode*** from being just a `LeafNode` to be a `Node<>`. First
-one was a simple node that can't have children and was used to display the content. The second one is a node that can
+The first change that we need to do is to change the ***RootNode*** from being just a `LeafNode` to
+be a `Node<>`. First
+one was a simple node that can't have children and was used to display the content. The second one
+is a node that can
 have children and can be used to navigate between them.
 
 The ***Node*** requires the `NavTarget` to be defined
-and `buildChildNode` function to be implemented - those two things will be responsible for handling creation of the
+and `buildChildNode` function to be implemented - those two things will be responsible for handling
+creation of the
 children nodes.
 
-Second important thing is the `appyxComponent = ` parameter that is used to define the way how the nodes will be
+Second important thing is the `appyxComponent = ` parameter that is used to define the way how the
+nodes will be
 handled.
 
 ```kotlin
@@ -240,7 +249,8 @@ class FirstNode(
 }
 ```
 
-To be able to navigate between the screens we will ad simple lambdas, that will be called in child nodes, but handled in
+To be able to navigate between the screens we will ad simple lambdas, that will be called in child
+nodes, but handled in
 root node.
 
 ```kotlin
@@ -290,28 +300,28 @@ override fun Content(modifier: Modifier) {
 }
 ```
 
-```kotlin
-        commonMain.dependencies {
-    ...
-    api(libs.appyx.components.spotlingh)
-}
-```
-
 ![AppyxNavigation](/blog/images/1_navigation.gif "Basic Navogation with Appyx")
 
-You can experiment with different visualisations, for example `BackStackFader`, `BackStackSlider`, `BackStackParallax`or
+You can experiment with different visualisations, for
+example `BackStackFader`, `BackStackSlider`, `BackStackParallax`or
 other mentioned in the [documentation](https://bumble-tech.github.io/appyx/components/backstack/)
 
 ### Tab Navigation
 
 To handle bottom navigation feature we need to use
-a [Spotlight](https://bumble-tech.github.io/appyx/components/spotlight/) component, which behaves similar to the view
-pager.
-It can hold multiple nodes at the same, and keeps one of them active (visible). The rule is same as with linear
-navigation, we just need to switch form ***backstack*** to ***spotlight***.
+a [Spotlight](https://bumble-tech.github.io/appyx/components/spotlight/) component, which behaves similar to the view pager.
+It can hold multiple nodes at the same, and keeps one of them active (visible). The rule is same as
+with linear navigation, we just need to switch from ***backstack*** to ***spotlight***.
 
 ```toml
 appyx-components-spotlingh = { module = "com.bumble.appyx:spotlight", version.ref = "appyx" }
+```
+
+```kotlin
+commonMain.dependencies {
+    ...
+    api(libs.appyx.components.spotlingh)
+}
 ```
 
 Lets create new navigation targets for tabbed navigation.
@@ -342,8 +352,10 @@ class SpotlightNode(
 )
 ```
 
-We have to provide `SpotlightModel` and `SpotlightVisualisation` one will handle navigation, other the animation.
-The model takes list of elements available to be displayed in the carousel, and initial index of default the active tab.
+We have to provide `SpotlightModel` and `SpotlightVisualisation` one will handle navigation, other
+the animation.
+The model takes list of elements available to be displayed in the carousel, and initial index of
+default the active tab.
 
 ```kotlin
 private fun spotlightModel(nodeContext: NodeContext) = SpotlightModel(
@@ -353,7 +365,8 @@ private fun spotlightModel(nodeContext: NodeContext) = SpotlightModel(
 )
 ```
 
-Last thing to do is to create a UI representation of the screen, we will use `Scaffold` and default buttons
+Last thing to do is to create a UI representation of the screen, we will use `Scaffold` and default
+buttons
 
 ```kotlin
 @Composable
@@ -394,16 +407,19 @@ class ThirdNode(
 }
 ```
 
-The solution is ready to use, as it was designed to work jus out of the box we need to add only the entrypoint to our
+The solution is ready to use, as it was designed to work jus out of the box we need to add only the
+entrypoint to our
 existing navigation.
-We need to add `TabScreen` as a ***NavTarget*** in the linear navigation, and a button in `FirstNode` that will run the
+We need to add `TabScreen` as a ***NavTarget*** in the linear navigation, and a button
+in `FirstNode` that will run the
 ***tabbed navigation*** feature.
 
 ![Tab Navigation with Spotlight](/blog/images/2_spotlight_tab_navigation.gif "Tab Navigation with Spotlight")
 
-Appyx also provides a [Material3](https://m3.material.io/) support with out of the box solution for bottom navigation,
+Appyx also provides a [Material3](https://m3.material.io/) support with out of the box solution for
+bottom navigation,
 so we can easily create it using built in components.
-The material support library uses the (spotlight)[https://bumble-tech.github.io/appyx/components/spotlight/] component
+The material support library uses the [spotlight](https://bumble-tech.github.io/appyx/components/spotlight/] component)
 under the hood, so the dependencies we need are:
 
 ```toml
@@ -411,16 +427,19 @@ appyx-utils-material = { module = "com.bumble.appyx:utils-material3", version.re
 ```
 
 ```kotlin
-        commonMain.dependencies {
+commonMain.dependencies {
     ...
     api(libs.appyx.utils.material)
 }
 ```
 
-After syncing the project we will reach the `AppyxNavItem` which will be used in a bottom navigation and
+After syncing the project we will reach the `AppyxNavItem` which will be used in a bottom navigation
+and
 the `AppyxMaterial3NavNode` responsible for navigation.
-Creation of the ***TabNavigationItems*** is pretty straightforward and similar to the previously used linear navigation.
-We need to create **destinations** in our case these will be the enums that will represent the screens/nodes.
+Creation of the ***TabNavigationItems*** is pretty straightforward and similar to the previously
+used linear navigation.
+We need to create **destinations** in our case these will be the enums that will represent the
+screens/nodes.
 
 ```kotlin
 @Parcelize
@@ -429,8 +448,10 @@ enum class TabNavigationItems : Parcelable {
 }
 ```
 
-Now we can create the ***resolver*** that will be responsible for creating the bottom bar. It takes the defined
-***destination*** and creates the proper navigation items, with ***text***, ***icons*** and lambda that will create
+Now we can create the ***resolver*** that will be responsible for creating the bottom bar. It takes
+the defined
+***destination*** and creates the proper navigation items, with ***text***, ***icons*** and lambda
+that will create
 desired ***nodes***.
 
 ```kotlin
@@ -468,23 +489,29 @@ class TabNode(
 )
 ```
 
-At the end we need to add another entrypoint in the ***FirstNode*** to be able to react freshly created screen.
+At the end we need to add another entrypoint in the ***FirstNode*** to be able to react freshly
+created screen.
 
 ![Tab Navigation with Material](/blog/images/3_material_tab_navigation.gif "Tab Navigation with Material")
 
 ### Coroutines
 
-There is no official approach how to handle coroutines inside the ***Nodes***, but we can use for example the
-***NodeLifecycle*** which provides the `lifecycle` and `lifecycleScope` and use it (as in the example).
-We can also use the `lifecycle` and add an `observer`with `PlatformLifecycleEventObserver` and create and manage the
-coroutineScope. We can also use the scope ot the @Composable view `rememberCoroutineScope()` or we can mix approaches to
+There is no official approach how to handle coroutines inside the ***Nodes***, but we can use for
+example the
+***NodeLifecycle*** which provides the `lifecycle` and `lifecycleScope` and use it (as in the
+example).
+We can also use the `lifecycle` and add an `observer`with `PlatformLifecycleEventObserver` and
+create and manage the
+coroutineScope. We can also use the scope ot the @Composable view `rememberCoroutineScope()` or we
+can mix approaches to
 fit all your needs.
 
-Moving further I will extend the ***SecondNode*** with a countdown timer that will be started on the screen creation and
+Moving further I will extend the ***SecondNode*** with a countdown timer that will be started on the
+screen creation and
 update the text value.
 
 ```kotlin
-    private val countDownText = mutableStateOf<String>("0")
+private val countDownText = mutableStateOf<String>("0")
 
 init {
     lifecycle.coroutineScope.launch {
@@ -507,35 +534,49 @@ override fun Content(modifier: Modifier) {
 }
 ```
 
-You should think about a better place to hold your business logic than `Node` a place that can handle the configuration
-changes and recreating of the view, a place that can retain the state. The `ViewModel` is a perfect place for that, but
+You should think about a better place to hold your business logic than `Node` a place that can
+handle the configuration
+changes and recreating of the view, a place that can retain the state. The `ViewModel` is a perfect
+place for that, but
 it's not a part of the Appyx library, so you need to implement it by yourself.
-Appyx is currently in the development phase of ***viewmodel*** support, and you can vote for
-ith [here](https://bumble-tech.github.io/appyx/navigation/integrations/viewmodel/?h=retain#alternative-retainedinstancestore).
+Appyx is currently in the development phase of ***ViewModel*** support, and you can vote for
+it [here](https://github.com/bumble-tech/appyx/issues/553).
 If you would like to survive configuration changes there is an
-official [guide](https://bumble-tech.github.io/appyx/navigation/features/surviving-configuration-changes/) for that.
+official [guide](https://bumble-tech.github.io/appyx/2.x/navigation/features/surviving-configuration-changes/)
+for that.
 
 ![Coroutines](/blog/images/4_coroutines_support.gif "Coroutines")
 
 ### Summary
 
-The `Appyx` library is a powerful tool that allows you to create a fully customized navigation in your Compose
+The `Appyx` library is a powerful tool that allows you to create a fully customized navigation in
+your Compose
 Multiplatform application.
-It's a great solution for creating complex navigation structures, and it's easy to use. The library is tightly coupled
-with te Jetpack Compose but doesn't provide dedicated component to hold your business logic, you are free to use your
+It's a great solution for creating complex navigation structures, and it's easy to use. The library
+is tightly coupled
+with te Jetpack Compose but doesn't provide dedicated component to hold your business logic, you are
+free to use your
 own solutions.
-The library is still in the development phase waiting for example for the `ViewModel` support as mentioned in the post.
-Therefore, it doesn't provide an out-of-the-box support for coroutines. You need to handle it by yourself, but it's not
+The library is still in the development phase waiting for example for the `ViewModel` support as
+mentioned in the post.
+Therefore, it doesn't provide an out-of-the-box support for coroutines. You need to handle it by
+yourself, but it's not
 a big deal.
 
-Comparing to [Decompose](https://github.com/mkonkel/DecomposeNavigation) it was quicker to set up the basic navigation,
+Comparing to [Decompose](https://github.com/mkonkel/DecomposeNavigation) it was quicker to set up
+the basic navigation,
 but it needs to use third-party for holding logic and develop whole app.
-From the other side comparing to [Voyager](https://github.com/mkonkel/VoyagerNavigation) I can find a lot of
-similarities on how it was designed to use, and how handles the navigation. Nevertheless, the ***Voyager*** was a bit
+From the other side comparing to [Voyager](https://github.com/mkonkel/VoyagerNavigation) I can find
+a lot of
+similarities on how it was designed to use, and how handles the navigation. Nevertheless, the
+***Voyager*** was a bit
 more intuitive for me, and I liked the way how it was designed to use.
-All in all every library has its pros and cons, and it's up to you to choose the best one for your project. I think you
+All in all every library has its pros and cons, and it's up to you to choose the best one for your
+project. I think you
 should try them all and decide which one fits your needs the best.
 
-I hope this post has given you a good overview of the `Appyx` library and how you can use it to create a navigation in
-your Compose Multiplatform application. If you have any questions or comments, please feel free to leave them below. I'd
+I hope this post has given you a good overview of the `Appyx` library and how you can use it to
+create a navigation in
+your Compose Multiplatform application. If you have any questions or comments, please feel free to
+leave them below. I'd
 love to hear from you!
